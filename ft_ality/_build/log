@@ -1,0 +1,16 @@
+# dune exec ./test.exe
+# OCAMLPARAM: unset
+# Shared cache: disabled
+# Shared cache location: /Users/chmadran/.cache/dune/db
+# Workspace root: /Users/chmadran/ft_ality/ft_ality
+# Auto-detected concurrency: 4
+# Dune context:
+#  { name = "default"
+#  ; kind = "default"
+#  ; profile = Dev
+#  ; merlin = true
+#  ; fdo_target_exe = None
+#  ; build_dir = In_build_dir "default"
+#  ; instrument_with = []
+#  }
+$ /Users/chmadran/.opam/4.13.1/bin/ocamlc.opt -config > /var/folders/k7/bzt5hyld3w52dgp85hycld2h0000gn/T/dune_850a6b_output
