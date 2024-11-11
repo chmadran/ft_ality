@@ -1,3 +1,4 @@
+all: clean build run
 
 build:
 	@echo "Building the project..."
@@ -6,7 +7,7 @@ build:
 # takes the main executable from the dune file 
 run:
 	@echo "Running the project..."
-	dune exec ./_build/default/src/test.exe
+	dune exec ./_build/default/src/main.exe -- $(ARG)
 
 clean:
 	@echo "Cleaning up..."

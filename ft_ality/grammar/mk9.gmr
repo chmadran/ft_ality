@@ -1,0 +1,26 @@
+down -> Down
+up -> Up
+left -> Backward
+right -> Forward
+caps -> Throw
+shift -> Punch
+
+----------------------
+
+[Punch, Forward]
+Front Punch !!
+
+[Punch, Backward]
+Back Punch !!
+
+[Punch, Up]
+Front Kick !!
+
+[Punch, Down]
+Back Kick !!
+
+[Throw, Backward]
+Flip Stance !!
+
+[Backward, Forward]
+Block !!

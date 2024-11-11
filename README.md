@@ -7,9 +7,12 @@ This project is consists in two steps: training a finite state automaton, and ru
 
 ## HOW TO RUN
 
-`` make TODO ``
+`` make build ``
+`` make run ARG="[GRAMMAR FILE]"``
 
 The program will wait for input from the keyboard, just like the training mode of a fighting game. So simply press keys on your keyboard, following the key mapping displayed on the screen, and move names should be displayed when their key combinations are executed.
+
+Inspiration for the grammar file : https://www.mksecrets.net/index.php?section=mk9&lang=eng&contentID=4796.
 
 ## RESEARCH 
 
