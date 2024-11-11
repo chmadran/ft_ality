@@ -6,5 +6,5 @@ let x = 3 + 4;;
 let y = x + x;;
 
 let () = 
-  printf "%d\n" y;
-  printf "%d\n" x;
+printf "%d\n" x;
+printf "%d\n" y;

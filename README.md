@@ -91,6 +91,31 @@ An FSA consists of:
 
 Example: An FSA for the language of binary strings ending in 0 would move between states to accept strings like 10, 110, but reject 11.
 
-FSAs are used in various applications, including parsing, network protocols, and text search algorithms. They’re powerful in pattern recognition but are limited to recognizing only regular languages.
+FSAs are used in various applications, including parsing, network protocols, and text search algorithms. They’re powerful in pattern recognition but are limited to recognizing only regular languages. In our case, the FSA will be represented by a tuple `A = (Q, Σ, Q₀, F, δ)` : 
+
+`Σ` is the input alphabet. It's the set of symbols or characters that the automaton can read. Think of it as the "vocabulary" the automaton understands.
+Example: If the FSA is designed to recognize words made of the letters a and b, then Σ = {a, b}.
+
+`Q` is the set of states in the automaton. A state is like a "status" the automaton can be in at any given time. The system switches between different states based on what it reads.
+Example: An FSA that checks if a string has an even or odd number of as might have two states: even and odd.
+Example: Q = {even, odd}
+
+`Q₀` is the starting state. It’s the state where the automaton begins when it starts processing an input. So, when the automaton starts, it's in Q₀.
+Example: If the starting state is the even state (where the automaton has seen an even number of as so far), then Q₀ = even.
+
+`F` is the set of final or accepting states. These are the states that the automaton considers "successful" or "accepted" when it finishes reading the input. If the automaton ends in a state from F, it means the input is accepted by the automaton.
+Example: If the automaton accepts strings that contain an even number of as, then F = {even}, because it should be in the even state when the string is accepted.
+
+`δ` is the transition function. It tells the automaton how to move from one state to another based on the current state and the symbol it reads. It is a function that takes in a state and a symbol from the input alphabet and returns the next state.
+Example: If the automaton is in the even state and reads the symbol a, it should transition to the odd state. If it's in the odd state and reads a, it should go back to the even state.
+
+So, δ might look something like this:
+
+* δ(even, a) → odd
+* δ(odd, a) → even
+* δ(even, b) → even
+* δ(odd, b) → odd
+
+It’s a function that tells you the next state for each symbol you encounter.
 
 </details>
