@@ -2,8 +2,8 @@ open Base
 open Stdio
 open GrammarFile 
 
-let check_file_input () =
-  match Sys.get_argv () with
+let check_file_input filename =
+  match filename with
   (*case1 : get the second argument*)
   | [| _; filename |] ->
     (try
@@ -30,7 +30,7 @@ let check_file_input () =
 
 let () =
   (* Assuming the file "grammar.txt" is passed as an argument *)
-  match check_file_input () with
+  match check_file_input (Sys.get_argv ()) with
   | Some filename ->
       (* If the file is valid, proceed with parsing *)
       printf "File '%s' is ready for parsing.\n" filename;

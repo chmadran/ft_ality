@@ -122,3 +122,33 @@ So, δ might look something like this:
 It’s a function that tells you the next state for each symbol you encounter.
 
 </details>
+
+<details><summary>Functional Programming</summary>
+
+You only look at input and produce output, no side effects.
+* But in Ocaml we can still cheat a bit to print() for example, to produce side effects.
+
+There are two main things you need to know to understand the concept:
+
+* Data is immutable: If you want to change data, such as an array, you return a new array with the changes, not the original.
+* Functions are stateless: Functions act as if for the first time, every single time! In other words, the function always gives the same return value for the same arguments.
+
+There are three best practices that you should generally follow:
+
+1. Your functions should accept at least one argument.
+2. Your functions should return data, or another function.
+3. Don’t use loops!
+
+No concatenation of commands
+* ex: do_thing1(); do_thing2()
+Instead, composition of functions
+* ex: print(sum(2, exp(1,2)))
+
+Posts
+* [Github Functional Programming 101](https://github.com/readme/guides/functional-programming-basics)
+
+Videos
+* [Functional Programming in 40 Minutes • Russ Olsen • GOTO 2018](https://www.youtube.com/watch?v=0if71HOyVjY)
+  * You can stop at 30 minutes
+  
+</details>
