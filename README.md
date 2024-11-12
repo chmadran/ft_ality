@@ -14,6 +14,19 @@ The program will wait for input from the keyboard, just like the training mode o
 
 Inspiration for the grammar file : https://www.mksecrets.net/index.php?section=mk9&lang=eng&contentID=4796.
 
+## PROJECT FLOW
+1. main.ml gets the arguments and check the file accessibility, and send it to Parser
+   1. main.ml also handles all the input->function->output->function->output->function... flow
+2. Parser reads the file line by line, verifying the syntax, get all moves then all combos and pass them as lists to Validator
+3. Validate the moves and combos, and pass them to Trainer
+   1. Check that there is no duplicates in moves
+   2. Check that there are no duplicate combos and they only use moves from alphabet
+4. Trainer receives the validated lists, builds the finite-state-automaton and pass it to Automaton:
+   1. Alphabet
+   2. States
+   3. Transitions
+5. Automaton reads input from the keyboard, evolve from state to state and print combos when they are performed
+
 ## RESEARCH 
 
 <details><summary>Language Theory</summary>
