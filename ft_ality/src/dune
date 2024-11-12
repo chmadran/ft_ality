@@ -1,4 +1,3 @@
 (executable
  (name main)
- (modules grammarFile main)
- (libraries base stdio unix))
+ (libraries base stdio core unix parser))

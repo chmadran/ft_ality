@@ -1,55 +1,41 @@
 open Base
 open Stdio
-open GrammarFile 
+open Parser
 
-let check_file_input filename =
-  match filename with
-  (*case1 : get the second argument*)
-  | [| _; filename |] ->
-    (try
-       if In_channel.with_file filename ~f:(fun _ -> true) then
-         Some filename
-       else (
-         printf "Error: The file '%s' is not readable.\n" filename;
-         None
-       )
-     with (*if try fails*)
-     | Sys_error err ->
-       printf "Error: %s\n" err;
-       None)
-
-  (*case2 : more than one arg detected*)
-  | [| _; _; _ |] ->  
-    printf "Error: Too many arguments provided. Please provide only one file as input.\n";
-    None
-
-  (*case3 : no args, only executable*)
-  | _ -> 
-    printf "Error: you need to provide one file as input.\n";
-    None
+(** [check_file_input args] verifies that only one filename is provided 
+    and checks if the file is accessible and readable. *)
+      let check_file_input args =
+        match args with
+        | [| _; filename |] ->
+          (try
+              Option.some_if (In_channel.with_file filename ~f:(fun _ -> true)) filename
+            with
+            | Sys_error err ->
+              printf "Error: %s\n" err;
+              None)
+        | [| _; _; _ |] ->  
+          printf "Error: Too many arguments provided. Please provide only one file as input.\n";
+          None
+        | _ -> 
+          printf "Error: you need to provide one file as input.\n";
+          None
 
 let () =
-  (* Assuming the file "grammar.txt" is passed as an argument *)
   match check_file_input (Sys.get_argv ()) with
   | Some filename ->
-      (* If the file is valid, proceed with parsing *)
-      printf "File '%s' is ready for parsing.\n" filename;
+    printf "File '%s' is ready for parsing.\n" filename;
 
-      (* Instantiate the grammarFile object with the valid filename *)
-      let grammar = new grammarFile filename in
+    let key_tokens, move_tokens = process_grammar_file filename in
+    printf "Key Mapping as Tokens:\n";
+    List.iter key_tokens ~f:(fun token -> printf "%s\n" token);
+    printf "\nMove Sequence as Tokens:\n";
+    List.iter move_tokens ~f:(fun token -> printf "%s\n" token);
 
-      (* Read and parse the grammar file *)
-      grammar#read_grammar_file ();
+    printf "Parsing and Tokenisation are complete\n\n";
+    (* At this stage @ellacroix you can use the tokens to test the finite automaton 
+       if you want or need *)
 
-      (* Show all key mappings *)
-      printf "Key Mappings:\n";
-      grammar#show_key_mappings ();
 
-      (* Show all move sequences *)
-      printf "\nMove Sequences:\n";
-      grammar#show_move_sequences ()
-
-  | None -> 
-      (* Handle the case where no valid filename is provided *)
-      printf "Error: Exiting program.\n";
-      Caml.exit 1
+  | None ->
+    printf "Error: Exiting program.\n";
+    Caml.exit 1
