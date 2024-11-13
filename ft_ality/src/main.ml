@@ -1,10 +1,10 @@
 open Base
-(* open Stdio *)
-(* open Parser *)
+open Stdio
+open Parser
 
-(** [check_file_input args] verifies that only one filename is provided 
+(* [check_file_input args] verifies that only one filename is provided 
     and checks if the file is accessible and readable. *)
-(* let check_file_input args =
+let check_file_input args =
   match args with
   | [| _; filename |] ->
     (try
@@ -18,9 +18,9 @@ open Base
     None
   | _ -> 
     printf "Error: you need to provide one file as input.\n";
-    None *)
+    None
 
-(* let () =
+let () =
   match check_file_input (Sys.get_argv ()) with
   | Some filename ->
     printf "File '%s' is ready for parsing.\n" filename;
@@ -44,25 +44,4 @@ open Base
 
   | None ->
     printf "Error: Exiting program.\n";
-    Caml.exit 1 *)
-
-
-let get_keypress () =
-  let termio = Unix.tcgetattr Unix.stdin in
-  let () =
-      Unix.tcsetattr Unix.stdin Unix.TCSADRAIN
-          { termio with Unix.c_icanon = false ; c_echo = false } in
-  let res = Stdio.In_channel.input_char Stdio.In_channel.stdin in
-  Unix.tcsetattr Unix.stdin Unix.TCSANOW termio;
-  res
-
-
-let get = function
-| Some v -> v
-| None -> raise (Invalid_argument "option is None")
-
-let () =
-  Stdio.printf "Hi\n";
-  let key = get_keypress () in
-  Stdio.printf "Here\n";
-  Stdio.printf "%c " (get key)
+    Caml.exit 1

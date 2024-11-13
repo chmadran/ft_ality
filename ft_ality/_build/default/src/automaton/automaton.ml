@@ -31,7 +31,7 @@ let automaton_loop alphabet states transitions =
 
   (* Currently, if i try to access stdin to get keypresses, NOTHING happens in the program until the loop is over
     I don't understand why, so deactivates it if you work on your code *)
-  let rec loop current_state () =
+  (* let rec loop current_state () =
     match current_state with
     | 1 -> Caml.exit 0
     (* Add your loop logic here *)
@@ -41,4 +41,4 @@ let automaton_loop alphabet states transitions =
     loop 1 ()
     | _ -> Caml.exit 1
   in
-  loop 0 ()
+  loop 0 () *)
