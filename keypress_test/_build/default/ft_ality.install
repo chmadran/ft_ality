@@ -1,0 +1,8 @@
+lib: [
+  "_build/install/default/lib/ft_ality/META"
+  "_build/install/default/lib/ft_ality/dune-package"
+  "_build/install/default/lib/ft_ality/opam"
+]
+bin: [
+  "_build/install/default/bin/ft_ality"
+]
