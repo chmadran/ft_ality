@@ -13,6 +13,7 @@ let get = function
 
 let () =
   Stdio.printf "Hi\n";
+  Stdio.Out_channel.flush Stdio.stdout; 
   let key = get_keypress () in
   Stdio.printf "Here\n";
   Stdio.printf "%c " (get key)

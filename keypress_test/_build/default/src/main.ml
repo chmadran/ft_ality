@@ -7,13 +7,13 @@ let get_keypress () =
   Unix.tcsetattr Unix.stdin Unix.TCSANOW termio;
   res
 
-
 let get = function
 | Some v -> v
 | None -> raise (Invalid_argument "option is None")
 
 let () =
   Stdio.printf "Hi\n";
+  Stdio.Out_channel.flush Stdio.stdout; 
   let key = get_keypress () in
   Stdio.printf "Here\n";
   Stdio.printf "%c " (get key)
