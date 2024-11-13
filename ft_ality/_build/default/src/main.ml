@@ -26,12 +26,20 @@ let () =
     printf "File '%s' is ready for parsing.\n" filename;
 
     let key_tokens, move_tokens = process_grammar_file filename in
-    printf "Key Mapping Tokens:\n";
+    printf "Key Mapping as Tokens:\n";
     List.iter key_tokens ~f:(fun token -> printf "%s\n" token);
-    printf "\nMove Sequence Tokens:\n";
+    printf "\nMove Sequence as Tokens:\n";
     List.iter move_tokens ~f:(fun token -> printf "%s\n" token);
 
     printf "Parsing and Tokenisation are complete\n\n";
+    
+    (* At this stage @ellacroix you can use the tokens to test the finite automaton 
+       if you want or need *)
+    printf "Automaton start\n\n";
+    let alphabet = ["up"; "down"] in
+    let states = [0;1] in
+    let transitions = [(0, "up", 1); (1, "down", 0)] in
+    Automaton.automaton_loop alphabet states transitions;
 
 
   | None ->

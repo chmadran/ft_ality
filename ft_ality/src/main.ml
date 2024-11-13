@@ -32,8 +32,14 @@ let () =
     List.iter move_tokens ~f:(fun token -> printf "%s\n" token);
 
     printf "Parsing and Tokenisation are complete\n\n";
+    
     (* At this stage @ellacroix you can use the tokens to test the finite automaton 
        if you want or need *)
+    printf "Automaton start\n\n";
+    let alphabet = ["up"; "down"] in
+    let states = [0;1] in
+    let transitions = [(0, "up", 1); (1, "down", 0)] in
+    Automaton.automaton_loop alphabet states transitions;
 
 
   | None ->
