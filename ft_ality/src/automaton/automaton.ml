@@ -16,6 +16,8 @@ let get_keypress () =
   let key_string =
     let res = input_char stdin in
     match res with
+    (* Cheat to esacpe in one keypress *)
+    | '~' -> "esc"
     | '\027' -> (
       (* Need to find a way to escape on the first press of ESC, because you can cheat by typing ESC then [ and stay in the program*)
       let res = input_char stdin in

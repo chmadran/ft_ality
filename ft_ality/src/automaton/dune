@@ -1,4 +1,4 @@
 (library
  (name automaton)
- (libraries base stdio sdl2 parser)
+ (libraries base stdio parser)
  (modules automaton))
