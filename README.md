@@ -12,7 +12,7 @@ This project is consists in two steps: training a finite state automaton, and ru
 
 The program will wait for input from the keyboard, just like the training mode of a fighting game. So simply press keys on your keyboard, following the key mapping displayed on the screen, and move names should be displayed when their key combinations are executed.
 
-Inspiration for the grammar file : https://www.mksecrets.net/index.php?section=mk9&lang=eng&contentID=4796.
+Inspiration for the grammar file : https://www.mksecrets.net/index.php?section=mk9&lang=eng&contentID=4796.   
 
 ## PROJECT FLOW
 1. main.ml gets the arguments and check the file accessibility, and send it to Parser
@@ -26,6 +26,44 @@ Inspiration for the grammar file : https://www.mksecrets.net/index.php?section=m
    2. States
    3. Transitions
 5. Automaton reads input from the keyboard, evolve from state to state and print combos when they are performed
+
+
+## PARSING 
+
+The rules we defined for our grammar files are as follows :   
+
+Line 0: key -> action\n   
+Line 1: key -> action\n   
+Line 2: X actions in between two brackets\n  
+Line 3 : Combo name\n   
+Line 4: Empty    
+Line 5: X actions in between two brackets\n   
+Line 6 : Combo name\n   
+Line 7: Empty  
+etc...  
+
+**For Keys**    
+* Character Check: Each key is a single alphabetical character or a valid directional word (only up, down, left, right).   
+* Separator Check: Presence of the -> separator to ensure valid key mappings.    
+* Carriage return Check: Presence of the \n separator between key mappings.   
+* Uniqueness of Keys: Each key is mapped to only one action, rejecting duplicates.   
+
+
+**Separator Line**     
+* Presence of the separator line "------" to clearly mark the boundary between mappings and moves.
+
+**For Moves**     
+1. Combo Format:   
+* The combo part is enclosed in two square brackets ([ ]).   
+* Each combo contains valid keys (matching the defined keys from the mappings section).   
+2. Move Naming: The move name follows the combo.   
+3. Check Defined Keys: All keys in each combo are defined in the mappings section.   
+
+**General Rules**
+1. Special Character Rejection: Any special characters gets detected and triggers an error. We only accept alphabetic characters (and not alphanumeric why the hell would you wanna use numbers), brackets [ ], separator "->", and line separators (\n).  
+2. Trim Excessive Whitespace: Extra spaces are removed to standardize input format.   
+3. Limit on Move Count: Set maximum number of moves and mappings to 10 (even if it’s theoretical since there is already an alphabet-based limit on keys).   
+4. Error Handling: If a line fails validation at any point, we exit the program immediately.    
 
 ## RESEARCH 
 
