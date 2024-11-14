@@ -2,8 +2,9 @@ down -> Down
 up -> Up
 left -> Backward
 right -> Forward
-caps -> Throw
-shift -> Punch
+q -> Punch
+w -> Kick
+e -> Throw
 
 ----------------------
 
@@ -13,10 +14,10 @@ Front Punch !!
 [Punch, Backward]
 Back Punch !!
 
-[Punch, Up]
+[Kick, Forward]
 Front Kick !!
 
-[Punch, Down]
+[Kick, Backward]
 Back Kick !!
 
 [Throw, Backward]
