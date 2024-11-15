@@ -50,14 +50,14 @@ etc...
 
 
 **Separator Line**     
-* Presence of the separator line "------" to clearly mark the boundary between mappings and moves.
+* Presence of the separator line "------" to clearly mark the boundary between mappings and moves. It must be exactly 20 -
 
 **For Moves**     
 1. Combo Format:   
 * The combo part is enclosed in two square brackets ([ ]).   
 * Each combo contains valid keys (matching the defined keys from the mappings section).   
 2. Move Naming: The move name follows the combo.   
-3. Check Defined Keys: All keys in each combo are defined in the mappings section.   
+3. Check Defined Keys: All actions in each combo are defined in the mappings section.   
 
 **General Rules**
 1. Special Character Rejection: Any special characters gets detected and triggers an error. We only accept alphabetic characters (and not alphanumeric why the hell would you wanna use numbers), brackets [ ], separator "->", and line separators (\n).  
