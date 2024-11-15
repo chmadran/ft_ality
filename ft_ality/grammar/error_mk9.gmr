@@ -1,0 +1,60 @@
+# Valid key mappings
+down -> Down
+up -> Hello
+left -> Backward
+right -> Forward
+q -> Punch
+w -> Kick
+e -> Throw
+
+# Error: Duplicate key
+# q -> PunchDuplicate
+
+# Error: Duplicate action
+# z -> Kick
+
+# Error: Invalid key (too many characters, just one alphabetic ch is valid)
+# space -> Jump
+
+# Error: Invalid action (contains special characters)
+# r -> Roll@
+
+--------------------
+
+# Valid move definitions
+[Punch, Forward]
+Front Punch !!
+
+[Punch, Forward]
+Front Punch 2 !!
+
+[Punch, Backward]
+Back Punch !!
+
+[Kick, Forward]
+Front Kick !!
+
+[Kick, Backward]
+Back Kick !!
+
+[Throw, Backward]
+Flip Stance !!
+
+[Backward, Forward]
+Block !!
+
+# Error: Undefined action in combo
+# [Slide, Forward]
+# Unknown Slide !!
+
+# Error: Move name duplicate
+# [Punch, Forward]
+# Front Punch !!
+
+# Error: Invalid combo format (missing closing bracket)
+# [Punch, Forward
+# Unfinished Punch !!
+
+# Error: Missing combo sequence
+# []
+# No Combo !!

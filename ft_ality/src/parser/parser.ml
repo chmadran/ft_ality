@@ -6,22 +6,26 @@ type move = { name : string; key_combination : string list }
 
 exception ParseError of string
 
+(** [is_valid_key key] checks if a key is a single alphabetic character or a direction name. *)
+let is_valid_key key =
+  let directions = ["up"; "down"; "left"; "right"] in
+  (String.length key = 1 && Char.is_alpha key.[0]) || List.mem directions key ~equal:String.equal
+
 (** [parse_key_mapping line] parses a line into a [key_mapping] record :
-    * check that the parts list has exactly three elements: [key; "->"; action]
-else it gets ignored. 
-    * key is a valid character (alphabet or direction word), with no special characters.
-*)
+    * Checks that the line has exactly three elements: [key; "->"; action].
+    * Validates that [key] is a valid key.
+    * Both key and action must be alphabetic. *)
 let parse_key_mapping line =
   let parts = String.split ~on:' ' line in
   match parts with
-  | [key; "->"; action] when String.for_all key ~f:Char.is_alpha && String.for_all action ~f:Char.is_alpha ->
+  | [key; "->"; action]
+    when is_valid_key key && String.for_all action ~f:Char.is_alpha ->
       Some { key = String.strip key; action = String.strip action }
   | _ -> None
 
-
-(** [parse_move_sequence ic line] parses lines to create a [move] record : 
-    * the combo starts with [ and ends with ].
-    * each element within key_combination is a defined key *)
+(** [parse_move_sequence ic line defined_actions] parses lines to create a [move] record:
+    * The combo starts with [ and ends with ].
+    * Each element within key_combination must be a defined key action. *)
 let parse_move_sequence ic line defined_actions =
   if String.length line > 2 && Char.(line.[0] = '[') && String.contains line ']' then
     let closing_bracket_index = String.index_exn line ']' in
@@ -45,15 +49,27 @@ let parse_move_sequence ic line defined_actions =
       raise (ParseError (Printf.sprintf "Undefined action in move combination [%s]" combo_str))
   else
     None
-    
 
-(** [tokenize_key_mapping km] converts a [key_mapping] record into a list of tokens *)
-let tokenize_key_mapping (km: key_mapping) : string list =
-  [km.key; km.action]
+(** [validate_key_mappings key_mappings] ensures no duplicate keys or actions exist. *)
+let validate_key_mappings key_mappings =
+  let keys = List.map key_mappings ~f:(fun km -> km.key) in
+  let actions = List.map key_mappings ~f:(fun km -> km.action) in
+  let duplicate_keys = List.contains_dup keys ~compare:String.compare in
+  let duplicate_actions = List.contains_dup actions ~compare:String.compare in
+  if duplicate_keys then
+    Error "Duplicate keys found in key mappings."
+  else if duplicate_actions then
+    Error "Duplicate actions found in key mappings."
+  else
+    Ok ()
 
-(** [tokenize_move mv] converts a [move] record into a list of tokens *)
-let tokenize_move (mv: move) : string list =
-  mv.key_combination @ [mv.name]    
+(** [validate_moves moves] ensures move names are unique. *)
+let validate_moves moves =
+  let move_names = List.map moves ~f:(fun mv -> mv.name) in
+  if List.contains_dup move_names ~compare:String.compare then
+    Error "Duplicate move names found."
+  else
+    Ok ()
 
 (** [parse_grammar_file path] reads a file and parses it into lists of key mappings and moves,
 exiting with specific errors for key mapping or move parsing issues. *)
@@ -75,12 +91,7 @@ let parse_grammar_file path =
       else if not !parsing_moves then
         match parse_key_mapping line with
         | Some km -> key_mappings := km :: !key_mappings
-        | None ->
-            (* If we are still parsing key mappings, then it's a malformed key mapping, not a missing separator *)
-            if List.is_empty !key_mappings then
-              raise (ParseError (Printf.sprintf "Invalid key mapping format: '%s'" line))
-            else
-              raise (ParseError (Printf.sprintf "Missing valid separator '-' x 20. Invalid key mapping: '%s'" line))
+        | None -> raise (ParseError (Printf.sprintf "Invalid key mapping: '%s'" line))
       else
         let defined_actions = List.map !key_mappings ~f:(fun km -> km.action) in
         match parse_move_sequence ic line defined_actions with
@@ -88,67 +99,44 @@ let parse_grammar_file path =
         | None -> raise (ParseError (Printf.sprintf "Invalid move sequence: '%s'" line))
     );
     In_channel.close ic;
-    if List.is_empty !move_sequences then
-      raise (ParseError "No move sequences found in the grammar file.");
     (!key_mappings, !move_sequences)
   with
-  | ParseError _ as ex ->
-    In_channel.close ic;
-    raise ex
   | ex ->
     In_channel.close ic;
     raise ex
 
-
-(** [show_key_mappings key_mappings] prints each key mapping in the list. *)
-let show_key_mappings key_mappings =
-  List.iter key_mappings ~f:(fun km ->
-    printf "%s -> %s\n" km.key km.action
-  )
-
-(** [show_move_sequences moves] prints each move and its key combination in the list. *)
-let show_move_sequences moves =
-  List.iter moves ~f:(fun mv ->
-    printf "%s move: %s\n" mv.name (String.concat ~sep:", " mv.key_combination)
-  )
-
-(** [validate_grammar] enforces general rules for the grammar:
-    * Check that key_mappings is not empty
-    * Check for duplicates within key_mappings and move_sequences
-    * Ensure there are no unexpected special characters
-    * Trim whitespace from each parsed element   
-  *)
+(** [validate_grammar key_mappings moves] performs all validations on parsed data. *)
 let validate_grammar key_mappings moves =
-  let unique_keys = List.dedup_and_sort ~compare:String.compare (List.map key_mappings ~f:(fun km -> km.key)) in
-  if List.length unique_keys <> List.length key_mappings then
-    Error "Duplicate key mappings detected."
-  else if List.exists moves ~f:(fun mv -> List.length mv.key_combination = 0 || String.is_empty mv.name) then
-    Error "Invalid move format."
-  else Ok ()
-  
-
-(* The function that combines the parsing, validation and tokenization process. *)
+  match validate_key_mappings key_mappings with
+  | Error msg -> Error msg
+  | Ok () -> (
+      match validate_moves moves with
+      | Error msg -> Error msg
+      | Ok () -> Ok ()
+    )
 
 let process_grammar_file path =
   try
     let key_mappings, move_sequences = parse_grammar_file path in
     match validate_grammar key_mappings move_sequences with
-    | Ok () ->
-        let tokenized_key_mappings = List.concat_map key_mappings ~f:tokenize_key_mapping in
-        let tokenized_moves = List.concat_map move_sequences ~f:tokenize_move in
-        (tokenized_key_mappings, tokenized_moves)
-    | Error msg ->
-        eprintf "Validation error: %s\n" msg;
-        (* Exit program immediately on validation error *)
-        Stdlib.exit 1
+    | Ok () -> (key_mappings, move_sequences)
+    | Error msg -> raise (ParseError msg)
   with
   | ParseError msg ->
     eprintf "Parsing error: %s\n" msg;
-    (* Exit program immediately on parsing error *)
     Stdlib.exit 1
   | ex ->
     eprintf "Unexpected error: %s\n" (Exn.to_string ex);
-    (* Exit program immediately on any unexpected error *)
     Stdlib.exit 1
 
+(** [show_key_mappings key_mappings] prints each key mapping in a human-readable format. *)
+let show_key_mappings key_mappings =
+  List.iter key_mappings ~f:(fun km ->
+    printf "Key: '%s' -> Action: '%s'\n" km.key km.action
+  )
 
+(** [show_moves moves] prints each move in a human-readable format. *)
+let show_move_sequences moves =
+  List.iter moves ~f:(fun mv ->
+    printf "Move Name: '%s', Combo: [%s]\n" mv.name (String.concat ~sep:", " mv.key_combination)
+  )
