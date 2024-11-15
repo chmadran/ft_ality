@@ -1,4 +1,4 @@
 (library
  (name parser)
- (libraries base stdio)
+ (libraries base stdio unix)
  (modules parser))
