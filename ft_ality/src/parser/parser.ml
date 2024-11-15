@@ -137,15 +137,15 @@ let process_grammar_file path =
     | Error msg ->
         eprintf "Validation error: %s\n" msg;
         (* Exit program immediately on validation error *)
-        Caml.exit 1
+        Stdlib.exit 1
   with
   | ParseError msg ->
     eprintf "Parsing error: %s\n" msg;
     (* Exit program immediately on parsing error *)
-    Caml.exit 1
+    Stdlib.exit 1
   | ex ->
     eprintf "Unexpected error: %s\n" (Exn.to_string ex);
     (* Exit program immediately on any unexpected error *)
-    Caml.exit 1
+    Stdlib.exit 1
 
 

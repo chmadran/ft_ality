@@ -51,7 +51,7 @@ let () =
 
   | None ->
     printf "Error: Exiting program.\n";
-    Caml.exit 1
+    Stdlib.exit 1
 
 
 
