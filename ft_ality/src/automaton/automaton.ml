@@ -75,7 +75,7 @@ let automaton_loop alphabet accepting_states transitions =
     printf "\nCurrent_state: %s\n" (string_list_to_string current_state);
     let key = get_keypress () in
     match key with
-    | "esc" -> Caml.exit 0
+    | "esc" -> Stdlib.exit 0
     | _ ->
       let action = translate_key key alphabet in
       printf "Key pressed: %s, Action: %s\n" key action;
