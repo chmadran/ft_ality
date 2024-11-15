@@ -1,10 +1,18 @@
 open Stdio
+open Parser
 
 type transition = { state : string list; key_pressed : string; next_state : string list }
 
+let translate_key key alphabet =
+  try
+    let key_mapping = (List.find (fun r -> r.key = key) alphabet) in
+    let action = key_mapping.action in
+    action
+  with Not_found -> ""
+
 (* Function to convert a string list to a string *)
 let string_list_to_string lst =
-	"[" ^ (String.concat "; " lst) ^ "]"
+	String.concat "; " lst
 
 let print_transition tr =
   printf "State: %s, Key: %s, Next state: %s\n" (string_list_to_string tr.state) tr.key_pressed (string_list_to_string tr.next_state)
@@ -38,18 +46,25 @@ let get_keypress () =
   Unix.tcsetattr Unix.stdin Unix.TCSANOW termio;
   key_string
 
-let find_records (state: string list) (key: string) (transitions: transition list)=
-  List.filter (fun r -> r.state = state && r.key_pressed = key) transitions
+let find_record (state: string list) (action: string) (transitions: transition list) =
+  try
+    List.find (fun r -> r.state = state && r.key_pressed = action) transitions
+  with Not_found -> {state = [""]; key_pressed = ""; next_state = [""]}
 
-let process_key current_state key transitions =
-  (* let matching_record = find_records current_state key transitions in
+let process_action current_state action transitions =
+  let matching_record = find_record current_state action transitions in
   match matching_record with
-  | [] -> ["Initial"]
-  | _ -> (List.hd matching_record).next_state *)
-  [(string_list_to_string current_state);key; List.hd((List.hd transitions).state)]
+  | {state = [""]; key_pressed = ""; next_state = [""]} -> ["Initial"]
+  | _ -> let next_state = matching_record.next_state in
+  printf "Found Next State: %s\n" (string_list_to_string next_state);
+  next_state
 
-(* let is_accepting_states next_state accepting_states =
-  List.exists (fun move -> move.key_combination = next_state) accepting_states *)
+let is_accepting_state next_state accepting_states =
+  List.exists (fun move -> move.key_combination = next_state) accepting_states
+
+let print_move_names state accepting_states = 
+  let moves = List.filter (fun r -> r.key_combination = state) accepting_states in
+  List.iter (fun mv -> printf "%s\n" mv.name) moves
 
 let automaton_loop alphabet accepting_states transitions =
   Parser.show_key_mappings alphabet;
@@ -57,17 +72,18 @@ let automaton_loop alphabet accepting_states transitions =
   List.iter print_transition transitions;
 
   let rec loop current_state () =
-    printf "current_state:%s\n" (string_list_to_string current_state);
+    printf "\nCurrent_state: %s\n" (string_list_to_string current_state);
     let key = get_keypress () in
     match key with
     | "esc" -> Stdlib.exit 0
     | _ ->
-      let next_state = process_key current_state key transitions in
-      printf "Key pressed: %s, next_state: %s\n" key (string_list_to_string next_state);
-      (* if is_accepting_states next_state accepting_states then
-        printf "Accepting state: %s\n" (string_list_to_string current_state)
-      else
-        print "Non accepting state\n" *)
+      let action = translate_key key alphabet in
+      printf "Key pressed: %s, Action: %s\n" key action;
+      let next_state = process_action current_state action transitions in
+      printf "Next_state: %s\n" (string_list_to_string next_state);
+      if is_accepting_state next_state accepting_states then
+        printf "%s is an accepting state\n" (string_list_to_string next_state);
+        print_move_names next_state accepting_states;
       loop next_state ()
   in
   loop ["Initial"] ()
