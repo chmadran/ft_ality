@@ -45,7 +45,10 @@ let () =
     let accepting_states = [{name = "Front Punch !!"; key_combination = ["Punch"; "Forward"]}; {name = "Back Punch !!"; key_combination = ["Punch"; "Backward"]};
 							{name = "Front Kick !!"; key_combination = ["Kick"; "Forward"]}; {name = "Back Kick !!"; key_combination = ["Kick"; "Backward"]};
 							{name = "Flip Stance !!"; key_combination = ["Throw"; "Backward"]}; {name = "Block !!"; key_combination = ["Backward"; "Forward"]}] in
-    let transitions = [{state = ["Initial"]; key_pressed = "Punch"; next_state = ["Punch"]}; {state = ["Punch"]; key_pressed = "Forward"; next_state = ["Punch"; "Forward"]}] in
+    let transitions = [{state = ["Initial"]; key_pressed = "Punch"; next_state = ["Punch"]};
+                        {state = ["Punch"]; key_pressed = "Forward"; next_state = ["Punch"; "Forward"]};
+                        {state = ["Punch"]; key_pressed = "Punch"; next_state = ["Punch"]};
+                        {state = ["Punch"; "Forward"]; key_pressed = "Punch"; next_state = ["Punch"]}] in
     Automaton.automaton_loop alphabet accepting_states transitions
 
 

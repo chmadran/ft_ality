@@ -20,11 +20,11 @@ let print_transition tr =
 let get_keypress () =
   Stdio.Out_channel.flush Stdio.stdout;
   let termio = Unix.tcgetattr Unix.stdin in
-  let () = Unix.tcsetattr Unix.stdin Unix.TCSANOW { termio with Unix.c_icanon = false ; c_echo = false } in
+  let () = Unix.tcsetattr Unix.stdin Unix.TCSADRAIN { termio with Unix.c_icanon = false ; c_echo = false } in
   let key_string =
     let res = input_char stdin in
     match res with
-    (* Cheat to esacpe in one keypress *)
+    (* Cheat to escape in one keypress with Del key*)
     | '~' -> "esc"
     | '\027' -> (
       (* Need to find a way to escape on the first press of ESC, because you can cheat by typing ESC then [ and stay in the program*)
@@ -43,7 +43,7 @@ let get_keypress () =
     )
     | _ -> String.make 1 res
   in 
-  Unix.tcsetattr Unix.stdin Unix.TCSANOW termio;
+  Unix.tcsetattr Unix.stdin Unix.TCSADRAIN termio;
   key_string
 
 let find_record (state: string list) (action: string) (transitions: transition list) =
@@ -56,7 +56,7 @@ let process_action current_state action transitions =
   match matching_record with
   | {state = [""]; key_pressed = ""; next_state = [""]} -> ["Initial"]
   | _ -> let next_state = matching_record.next_state in
-  printf "Found Next State: %s\n" (string_list_to_string next_state);
+  (* printf "Found Next State: %s\n" (string_list_to_string next_state); *)
   next_state
 
 let is_accepting_state next_state accepting_states =
@@ -72,18 +72,20 @@ let automaton_loop alphabet accepting_states transitions =
   List.iter print_transition transitions;
 
   let rec loop current_state () =
-    printf "\nCurrent_state: %s\n" (string_list_to_string current_state);
     let key = get_keypress () in
     match key with
     | "esc" -> Caml.exit 0
     | _ ->
       let action = translate_key key alphabet in
-      printf "Key pressed: %s, Action: %s\n" key action;
-      let next_state = process_action current_state action transitions in
-      printf "Next_state: %s\n" (string_list_to_string next_state);
-      if is_accepting_state next_state accepting_states then
-        printf "%s is an accepting state\n" (string_list_to_string next_state);
-        print_move_names next_state accepting_states;
-      loop next_state ()
+      match action with
+      | "" -> loop current_state ()
+      | _ ->
+        (* printf "Key pressed: %s, Action: %s\n" key action; *)
+        let next_state = process_action current_state action transitions in
+        printf "\n[%s]\n" (string_list_to_string next_state);
+        if is_accepting_state next_state accepting_states then
+          (* printf "%s is an accepting state\n" (string_list_to_string next_state); *)
+          print_move_names next_state accepting_states;
+        loop next_state ()
   in
   loop ["Initial"] ()
