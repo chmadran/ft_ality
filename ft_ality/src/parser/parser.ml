@@ -11,11 +11,10 @@ exception ParseError of string
 else it gets ignored. 
     * key is a valid character (alphabet or direction word), with no special characters.
 *)
-
 let parse_key_mapping line =
   let parts = String.split ~on:' ' line in
   match parts with
-  | [key; "->"; action] when String.for_all key ~f:Char.is_alpha ->
+  | [key; "->"; action] when String.for_all key ~f:Char.is_alpha && String.for_all action ~f:Char.is_alpha ->
       Some { key = String.strip key; action = String.strip action }
   | _ -> None
 
@@ -76,7 +75,12 @@ let parse_grammar_file path =
       else if not !parsing_moves then
         match parse_key_mapping line with
         | Some km -> key_mappings := km :: !key_mappings
-        | None -> raise (ParseError (Printf.sprintf "Invalid key mapping: '%s'" line))
+        | None ->
+            (* If we are still parsing key mappings, then it's a malformed key mapping, not a missing separator *)
+            if List.is_empty !key_mappings then
+              raise (ParseError (Printf.sprintf "Invalid key mapping format: '%s'" line))
+            else
+              raise (ParseError (Printf.sprintf "Missing valid separator '-' x 20. Invalid key mapping: '%s'" line))
       else
         let defined_actions = List.map !key_mappings ~f:(fun km -> km.action) in
         match parse_move_sequence ic line defined_actions with
@@ -94,7 +98,6 @@ let parse_grammar_file path =
   | ex ->
     In_channel.close ic;
     raise ex
-
 
 
 (** [show_key_mappings key_mappings] prints each key mapping in the list. *)
