@@ -54,10 +54,13 @@ let find_record (state: string list) (action: string) (transitions: transition l
 let process_action current_state action transitions =
   let matching_record = find_record current_state action transitions in
   match matching_record with
-  | {state = [""]; key_pressed = ""; next_state = [""]} -> ["Initial"]
-  | _ -> let next_state = matching_record.next_state in
-  (* printf "Found Next State: %s\n" (string_list_to_string next_state); *)
-  next_state
+  | {state = [""]; key_pressed = ""; next_state = [""]} -> (
+    let matching_record = find_record ["Initial"] action transitions in
+    match matching_record with
+    | {state = [""]; key_pressed = ""; next_state = [""]} -> ["Initial"]
+    | _ -> matching_record.next_state 
+  )
+  | _ -> matching_record.next_state 
 
 let is_accepting_state next_state accepting_states =
   List.exists (fun move -> move.key_combination = next_state) accepting_states
