@@ -85,10 +85,14 @@ let automaton_loop alphabet accepting_states transitions =
       | _ ->
         (* printf "Key pressed: %s, Action: %s\n" key action; *)
         let next_state = process_action current_state action transitions in
-        printf "\n[%s]\n" (string_list_to_string next_state);
-        if is_accepting_state next_state accepting_states then
-          (* printf "%s is an accepting state\n" (string_list_to_string next_state); *)
-          print_move_names next_state accepting_states;
-        loop next_state ()
+		match next_state with
+		| ["Initial"] -> (printf "\n[]\n"; loop next_state ())
+		| _ -> (
+			printf "\n[%s]\n" (string_list_to_string next_state);
+        	if is_accepting_state next_state accepting_states then
+          		(* printf "%s is an accepting state\n" (string_list_to_string next_state); *)
+          		print_move_names next_state accepting_states;
+        	loop next_state ()
+		)
   in
   loop ["Initial"] ()

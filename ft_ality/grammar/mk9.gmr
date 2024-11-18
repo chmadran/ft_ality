@@ -11,6 +11,9 @@ e -> Throw
 [Punch, Forward]
 Front Punch !!
 
+[Punch, Forward, Punch, Forward]
+Double Front Punch !!
+
 [Punch, Backward]
 Back Punch !!
 
