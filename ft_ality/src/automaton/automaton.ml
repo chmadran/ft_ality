@@ -67,7 +67,13 @@ let is_accepting_state next_state accepting_states =
 
 let print_move_names state accepting_states = 
   let moves = List.filter (fun r -> r.key_combination = state) accepting_states in
-  List.iter (fun mv -> printf "%s\n" mv.name) moves
+  match moves with
+  | [] -> print_endline "";
+  | _ -> List.iter (fun mv -> printf "%s\n" mv.name) moves
+
+let clear_screen () = 
+  print_endline "\027[2J";  (* ANSI escape code to clear screen *)
+  Stdio.Out_channel.flush Stdio.stdout  (* Ensure output is flushed *)
 
 let automaton_loop alphabet accepting_states transitions =
   Parser.show_key_mappings alphabet;
@@ -84,15 +90,14 @@ let automaton_loop alphabet accepting_states transitions =
       | "" -> loop current_state ()
       | _ ->
         (* printf "Key pressed: %s, Action: %s\n" key action; *)
+        clear_screen ();
         let next_state = process_action current_state action transitions in
-		match next_state with
-		| ["Initial"] -> (printf "\n[]\n"; loop next_state ())
-		| _ -> (
-			printf "\n[%s]\n" (string_list_to_string next_state);
-        	if is_accepting_state next_state accepting_states then
-          		(* printf "%s is an accepting state\n" (string_list_to_string next_state); *)
-          		print_move_names next_state accepting_states;
-        	loop next_state ()
-		)
+        match next_state with
+        | ["Initial"] -> (printf "\n[]\n\n"; loop next_state ())
+        | _ -> (
+          printf "\n[%s]\n" (string_list_to_string next_state);
+          print_move_names next_state accepting_states;
+          loop next_state ()
+        )
   in
   loop ["Initial"] ()

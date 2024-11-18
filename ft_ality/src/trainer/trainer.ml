@@ -5,7 +5,7 @@ open Parser
 let create_transition current_state next_state = 
   Stdio.printf "In create_transition %s -> %s\n" (Automaton.string_list_to_string current_state) (Automaton.string_list_to_string next_state);
   let transition = { state = current_state; key_pressed = List.hd (List.rev next_state); next_state = next_state } in
-  Automaton.print_transition transition;
+  (* Automaton.print_transition transition; *)
   transition
 
 let create_move_transitions move = 
@@ -26,7 +26,6 @@ let remove_duplicates transitions =
 let create_transitions move_sequences = 
   Stdio.printf "In create_transitions\n";
   Parser.show_move_sequences move_sequences;
-  Automaton.print_transition (create_transition ["Initial"] ["Punch"]);
 
   let transitions = List.flatten (List.map create_move_transitions move_sequences) in
   Stdio.printf "Generated transitions:\n";
