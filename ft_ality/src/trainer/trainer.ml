@@ -19,15 +19,32 @@ let create_move_transitions move =
   let transitions = List.map (fun (a, b) -> create_transition a b) (List.tl pairs) in
   List.append transitions [(create_transition ["Initial"] ([List.hd move.Parser.Moves_parser.key_combination]))]
 
-(* TO DO *)
-let remove_duplicates transitions = 
-  transitions
+let remove_duplicates transitions =
+  let rec remove_seen seen = function
+    | [] -> List.rev seen
+    | transition :: rest ->
 
-let create_transitions move_sequences = 
-  Printf.printf "In create_transitions\n";
-  Parser.show_move_sequences move_sequences;
+        if List.exists (fun t -> t.Automaton.state = transition.Automaton.state &&
+                                  t.Automaton.key_pressed = transition.Automaton.key_pressed &&
+                                  t.Automaton.next_state = transition.Automaton.next_state) seen then
+          remove_seen seen rest           
+        else
+          remove_seen (transition :: seen) rest  
+  in
+  remove_seen [] transitions  
 
-  let transitions = List.flatten (List.map create_move_transitions move_sequences) in
-  Printf.printf "Generated transitions:\n";
-  List.iter Automaton.print_transition transitions;
-  remove_duplicates transitions
+
+  let create_transitions move_sequences = 
+  
+    let transitions = List.flatten (List.map create_move_transitions move_sequences) in
+    Printf.printf "Generated transitions:\n";
+    Printf.printf "Len before: %d\n" (List.length transitions);
+    List.iter Automaton.print_transition transitions;
+    
+    let transitions_no_duplicates = remove_duplicates transitions in
+    
+    Printf.printf "After removing duplicates:\n";
+    Printf.printf "Len after: %d\n" (List.length transitions_no_duplicates);
+    List.iter Automaton.print_transition transitions_no_duplicates;
+    transitions_no_duplicates
+  
