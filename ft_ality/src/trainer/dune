@@ -1,4 +1,4 @@
 (library
  (name trainer)
- (libraries base stdio parser automaton)
+ (libraries parser automaton)
  (modules trainer))

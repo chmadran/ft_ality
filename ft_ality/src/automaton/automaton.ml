@@ -5,9 +5,8 @@ type transition = { state : string list; key_pressed : string; next_state : stri
 
 let translate_key key alphabet =
   try
-    let key_mapping = (List.find (fun r -> r.Key_mappings.key = key) alphabet) in
-    let action = key_mapping.Key_mappings.action in
-    action
+    let key_mapping = List.find (fun r -> r.Key_mappings.key = key) alphabet in
+    key_mapping.Key_mappings.action
   with Not_found -> ""
 
 (* Function to convert a string list to a string *)
@@ -15,19 +14,18 @@ let string_list_to_string lst =
   String.concat "; " lst
 
 let print_transition tr =
-  Printf.printf "State: %s, Key: %s, Next state: %s\n"
-    (string_list_to_string tr.state)
-    tr.key_pressed
-    (string_list_to_string tr.next_state)
+  print_endline
+    ("State: " ^ string_list_to_string tr.state ^ 
+     ", Key: " ^ tr.key_pressed ^ 
+     ", Next state: " ^ string_list_to_string tr.next_state)
 
 let get_keypress () =
-  Stdio.Out_channel.flush Stdio.stdout;
+  flush stdout;
   let termio = Unix.tcgetattr Unix.stdin in
-  let () = Unix.tcsetattr Unix.stdin Unix.TCSADRAIN { termio with Unix.c_icanon = false ; c_echo = false } in
+  let () = Unix.tcsetattr Unix.stdin Unix.TCSADRAIN { termio with Unix.c_icanon = false; c_echo = false } in
   let key_string =
     let res = input_char stdin in
     match res with
-    (* Cheat to escape in one keypress with Del key*)
     | '~' -> "esc"
     | '\027' -> (
         let res = input_char stdin in
@@ -40,7 +38,7 @@ let get_keypress () =
             | 'C' -> "right"
             | 'D' -> "left"
             | _ -> ""
-        )
+          )
         | _ -> "esc"
       )
     | _ -> String.make 1 res
@@ -51,17 +49,17 @@ let get_keypress () =
 let find_record (state: string list) (action: string) (transitions: transition list) =
   try
     List.find (fun r -> r.state = state && r.key_pressed = action) transitions
-  with Not_found -> {state = [""]; key_pressed = ""; next_state = [""]}
+  with Not_found -> { state = [""]; key_pressed = ""; next_state = [""] }
 
 let process_action current_state action transitions =
   let matching_record = find_record current_state action transitions in
   match matching_record with
-  | {state = [""]; key_pressed = ""; next_state = [""]} -> (
-    let matching_record = find_record ["Initial"] action transitions in
-    match matching_record with
-    | {state = [""]; key_pressed = ""; next_state = [""]} -> ["Initial"]
-    | _ -> matching_record.next_state
-  )
+  | { state = [""]; key_pressed = ""; next_state = [""] } -> (
+      let matching_record = find_record ["Initial"] action transitions in
+      match matching_record with
+      | { state = [""]; key_pressed = ""; next_state = [""] } -> ["Initial"]
+      | _ -> matching_record.next_state
+    )
   | _ -> matching_record.next_state
 
 let is_accepting_state next_state accepting_states =
@@ -71,11 +69,11 @@ let print_move_names state accepting_states =
   let moves = List.filter (fun r -> r.Moves_parser.key_combination = state) accepting_states in
   match moves with
   | [] -> print_endline ""
-  | _ -> List.iter (fun mv -> Printf.printf "%s\n" mv.Moves_parser.name) moves
+  | _ -> List.iter (fun mv -> print_endline mv.Moves_parser.name) moves
 
 let clear_screen () =
-  print_endline "\027[2J";  (* ANSI escape code to clear screen *)
-  Stdio.Out_channel.flush Stdio.stdout  (* Ensure output is flushed *)
+  print_endline "\027[2J"; (* ANSI escape code to clear screen *)
+  flush stdout (* Ensure output is flushed *)
 
 let automaton_loop alphabet accepting_states transitions =
   Parser.show_key_mappings alphabet;
@@ -85,7 +83,7 @@ let automaton_loop alphabet accepting_states transitions =
   let rec loop current_state () =
     let key = get_keypress () in
     match key with
-    | "esc" -> Stdlib.exit 0
+    | "esc" -> exit 0
     | _ ->
       let action = translate_key key alphabet in
       match action with
@@ -94,11 +92,11 @@ let automaton_loop alphabet accepting_states transitions =
         clear_screen ();
         let next_state = process_action current_state action transitions in
         match next_state with
-        | ["Initial"] -> (Printf.printf "\n[]\n\n"; loop next_state ())
+        | ["Initial"] -> (print_endline "\n[]\n"; loop next_state ())
         | _ -> (
-          Printf.printf "\n[%s]\n" (string_list_to_string next_state);
-          print_move_names next_state accepting_states;
-          loop next_state ()
-        )
+            print_endline ("\n[" ^ string_list_to_string next_state ^ "]\n");
+            print_move_names next_state accepting_states;
+            loop next_state ()
+          )
   in
   loop ["Initial"] ()

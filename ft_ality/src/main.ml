@@ -1,50 +1,41 @@
-open Base
-open Stdio
 open Parser
-(* open Automaton *)
 
 (* [check_file_input args] verifies that only one filename is provided 
-    and checks if the file is accessible and readable. *)
+   and checks if the file is accessible and readable. *)
 let check_file_input args =
   match args with
   | [| _; filename |] ->
     (try
-       Option.some_if (In_channel.with_file filename ~f:(fun _ -> true)) filename
+       let ic = open_in filename in
+       close_in ic;
+       Some filename
      with
      | Sys_error err ->
-       printf "Error: %s\n" err;
+       print_endline ("Error: " ^ err);
        None)
   | _ ->
-    printf "Error: Please provide exactly one file as input.\n";
+    print_endline "Error: Please provide exactly one file as input.";
     None
 
 let () =
-  match check_file_input (Sys.get_argv ()) with
+  match check_file_input (Sys.argv) with
   | Some filename ->
-    printf "Parsing file '%s'...\n" filename;
+    print_endline ("Parsing file '" ^ filename ^ "'...");
     let key_mappings, move_sequences = process_grammar_file filename in
-    printf "Key Mappings:\n";
-    List.iter key_mappings ~f:(fun km ->
-      printf "%s -> %s\n" km.key km.action
-    );
-    printf "\nMoves:\n";
-    List.iter move_sequences ~f:(fun mv ->
-      printf "%s: [%s]\n" mv.name (String.concat ~sep:", " mv.key_combination)
-    );
+
+    print_endline "Key Mappings:";
+    List.iter (fun km ->
+      print_endline (km.Key_mappings.key ^ " -> " ^ km.Key_mappings.action)
+    ) key_mappings;
+
+    print_endline "\nMoves:";
+    List.iter (fun mv ->
+      print_endline (mv.Parser.Moves_parser.name ^ ": [" ^ String.concat ", " mv.Parser.Moves_parser.key_combination ^ "]")
+    ) move_sequences;
 
     let transitions = Trainer.create_transitions move_sequences in
 
-    printf "Automaton start\n\n";
-    (* let alphabet = {"up": "Up"; "down": "Down"} in
-    let accepting_states = [0;1] in
-    let transitions = [(0, "up", 1); (1, "down", 0)] in *)
-    (* let alphabet = [{key = "up"; action = "Up"}; {key = "right"; action = "Forward"}; {key = "down"; action = "Down"}; {key = "left"; action = "Backward"};
-					{key = "q"; action = "Punch"}; {key = "w"; action = "Kick"}; {key = "e"; action = "Throw"}] in
-    let accepting_states = [{name = "Front Punch !!"; key_combination = ["Punch"; "Forward"]}; {name = "Back Punch !!"; key_combination = ["Punch"; "Backward"]};
-							{name = "Front Kick !!"; key_combination = ["Kick"; "Forward"]}; {name = "Back Kick !!"; key_combination = ["Kick"; "Backward"]};
-							{name = "Flip Stance !!"; key_combination = ["Throw"; "Backward"]}; {name = "Block !!"; key_combination = ["Backward"; "Forward"]}] in
-    let transitions = [{state = ["Initial"]; key_pressed = "Punch"; next_state = ["Punch"]};
-                        {state = ["Punch"]; key_pressed = "Forward"; next_state = ["Punch"; "Forward"]}] in *)
+    print_endline "Automaton start\n";
     Automaton.automaton_loop key_mappings move_sequences transitions
 
-  | None -> Stdlib.exit 1
+  | None -> exit 1
