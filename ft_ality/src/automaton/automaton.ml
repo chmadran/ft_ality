@@ -1,22 +1,24 @@
-open Stdio
-open Parser.Key_mappings  
-open Parser.Moves_parser
+module Key_mappings = Parser.Key_mappings
+module Moves_parser = Parser.Moves_parser
 
 type transition = { state : string list; key_pressed : string; next_state : string list }
 
 let translate_key key alphabet =
   try
-    let key_mapping = (List.find (fun r -> r.key = key) alphabet) in
-    let action = key_mapping.action in
+    let key_mapping = (List.find (fun r -> r.Key_mappings.key = key) alphabet) in
+    let action = key_mapping.Key_mappings.action in
     action
   with Not_found -> ""
 
 (* Function to convert a string list to a string *)
 let string_list_to_string lst =
-	String.concat "; " lst
+  String.concat "; " lst
 
 let print_transition tr =
-  printf "State: %s, Key: %s, Next state: %s\n" (string_list_to_string tr.state) tr.key_pressed (string_list_to_string tr.next_state)
+  Printf.printf "State: %s, Key: %s, Next state: %s\n"
+    (string_list_to_string tr.state)
+    tr.key_pressed
+    (string_list_to_string tr.next_state)
 
 let get_keypress () =
   Stdio.Out_channel.flush Stdio.stdout;
@@ -28,22 +30,21 @@ let get_keypress () =
     (* Cheat to escape in one keypress with Del key*)
     | '~' -> "esc"
     | '\027' -> (
-      (* Need to find a way to escape on the first press of ESC, because you can cheat by typing ESC then [ and stay in the program*)
-      let res = input_char stdin in
-      match res with
-      | '[' -> (
         let res = input_char stdin in
         match res with
-        | 'A' -> "up"
-        | 'B' -> "down"
-        | 'C' -> "right"
-        | 'D' -> "left"
-        | _ -> ""
+        | '[' -> (
+            let res = input_char stdin in
+            match res with
+            | 'A' -> "up"
+            | 'B' -> "down"
+            | 'C' -> "right"
+            | 'D' -> "left"
+            | _ -> ""
+        )
+        | _ -> "esc"
       )
-      | _ -> "esc"
-    )
     | _ -> String.make 1 res
-  in 
+  in
   Unix.tcsetattr Unix.stdin Unix.TCSADRAIN termio;
   key_string
 
@@ -59,20 +60,20 @@ let process_action current_state action transitions =
     let matching_record = find_record ["Initial"] action transitions in
     match matching_record with
     | {state = [""]; key_pressed = ""; next_state = [""]} -> ["Initial"]
-    | _ -> matching_record.next_state 
+    | _ -> matching_record.next_state
   )
-  | _ -> matching_record.next_state 
+  | _ -> matching_record.next_state
 
 let is_accepting_state next_state accepting_states =
-  List.exists (fun move -> move.key_combination = next_state) accepting_states
+  List.exists (fun move -> move.Moves_parser.key_combination = next_state) accepting_states
 
-let print_move_names state accepting_states = 
-  let moves = List.filter (fun r -> r.key_combination = state) accepting_states in
+let print_move_names state accepting_states =
+  let moves = List.filter (fun r -> r.Moves_parser.key_combination = state) accepting_states in
   match moves with
-  | [] -> print_endline "";
-  | _ -> List.iter (fun mv -> printf "%s\n" mv.name) moves
+  | [] -> print_endline ""
+  | _ -> List.iter (fun mv -> Printf.printf "%s\n" mv.Moves_parser.name) moves
 
-let clear_screen () = 
+let clear_screen () =
   print_endline "\027[2J";  (* ANSI escape code to clear screen *)
   Stdio.Out_channel.flush Stdio.stdout  (* Ensure output is flushed *)
 
@@ -90,13 +91,12 @@ let automaton_loop alphabet accepting_states transitions =
       match action with
       | "" -> loop current_state ()
       | _ ->
-        (* printf "Key pressed: %s, Action: %s\n" key action; *)
         clear_screen ();
         let next_state = process_action current_state action transitions in
         match next_state with
-        | ["Initial"] -> (printf "\n[]\n\n"; loop next_state ())
+        | ["Initial"] -> (Printf.printf "\n[]\n\n"; loop next_state ())
         | _ -> (
-          printf "\n[%s]\n" (string_list_to_string next_state);
+          Printf.printf "\n[%s]\n" (string_list_to_string next_state);
           print_move_names next_state accepting_states;
           loop next_state ()
         )
