@@ -1,4 +1,5 @@
 (library
  (name parser)
  (libraries base stdio unix)
- (modules parser))
+ (modules parser validator moves_parser key_mappings))
+

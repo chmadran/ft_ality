@@ -1,5 +1,6 @@
 open Stdio
-open Parser
+open Parser.Key_mappings  
+open Parser.Moves_parser
 
 type transition = { state : string list; key_pressed : string; next_state : string list }
 

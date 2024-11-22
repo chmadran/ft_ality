@@ -1,6 +1,6 @@
-(* open Stdio *)
 open Automaton
-open Parser
+open Parser.Moves_parser
+
 
 let create_transition current_state next_state = 
   Stdio.printf "In create_transition %s -> %s\n" (Automaton.string_list_to_string current_state) (Automaton.string_list_to_string next_state);
