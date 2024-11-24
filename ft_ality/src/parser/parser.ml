@@ -35,6 +35,9 @@ let parse_grammar_file path =
   with
   | End_of_file ->
     close_in ic;
+    (* Ensure moves are not empty after reaching EOF *)
+    if !move_sequences = [] then
+      raise (ParseError "No move sequences found in the grammar file.");
     (!key_mappings, !move_sequences)
   | ex ->
     close_in ic;
