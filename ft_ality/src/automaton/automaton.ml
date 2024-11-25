@@ -60,13 +60,13 @@ let print_move_names state accepting_states =
 
 let clear_screen () =
   print_endline "\027[2J"; (* ANSI escape code to clear screen *)
-  flush stdout (* Ensure output is flushed *)
+  flush stdout
 
 let automaton_loop alphabet accepting_states transitions =
   sdl_init ();
-  Parser.show_key_mappings alphabet;
+  (* Parser.show_key_mappings alphabet;
   Parser.show_move_sequences accepting_states;
-  List.iter print_transition transitions;
+  List.iter print_transition transitions; *)
 
   let rec loop current_state () =
     flush stdout;
@@ -79,6 +79,8 @@ let automaton_loop alphabet accepting_states transitions =
       | "" -> loop current_state ()
       | _ ->
         clear_screen ();
+        Parser.show_key_mappings alphabet;
+        Parser.show_move_sequences accepting_states;
         let next_state = process_action current_state action transitions in
         match next_state with
         | ["Initial"] -> (print_endline "\n[]\n"; loop next_state ())

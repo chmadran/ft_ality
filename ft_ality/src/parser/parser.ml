@@ -51,7 +51,7 @@ let process_grammar_file path =
     | Error msg -> raise (ParseError msg)
   with
   | ParseError msg ->
-    print_endline ("Parsing error: " ^ msg);  (* print_endline from Pervasives *)
+    print_endline ("Parsing error: " ^ msg);
     exit 1
   | ex ->
     (* Use pattern matching to print the exception message *)
@@ -59,7 +59,7 @@ let process_grammar_file path =
       | Sys_error msg -> msg  (* This is for Sys_error exception *)
       | _ -> "Unexpected error occurred"  (* Handle any other type of error *)
     in
-    print_endline ("Unexpected error: " ^ error_msg);  (* print_endline from Pervasives *)
+    print_endline ("Unexpected error: " ^ error_msg);
     exit 1
 
 (** [show_key_mappings key_mappings] prints each key mapping in a human-readable format. *)

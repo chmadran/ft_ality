@@ -36,7 +36,6 @@ let () =
 
     let transitions = Trainer.create_transitions move_sequences in
 
-    print_endline "Automaton start\n";
     Automaton.automaton_loop key_mappings move_sequences transitions
 
   | None -> exit 1

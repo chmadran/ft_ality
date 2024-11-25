@@ -2,18 +2,18 @@ module Automaton = Automaton
 module Parser = Parser
 
 let create_transition current_state next_state =
-  print_endline
+  (* print_endline
     ("In create_transition " ^
      Automaton.string_list_to_string current_state ^ " -> " ^
-     Automaton.string_list_to_string next_state);
+     Automaton.string_list_to_string next_state); *)
   { Automaton.state = current_state; 
     key_pressed = List.hd (List.rev next_state); 
     next_state = next_state }
 
 let create_move_transitions move =
-  print_endline
+  (* print_endline
     ("Creating transitions for: " ^ move.Parser.Moves_parser.name ^ " " ^
-     Automaton.string_list_to_string move.Parser.Moves_parser.key_combination);
+     Automaton.string_list_to_string move.Parser.Moves_parser.key_combination); *)
   let pairs =
     List.mapi
       (fun n _ ->
@@ -45,14 +45,14 @@ let remove_duplicates transitions =
 
 let create_transitions move_sequences =
   let transitions = List.flatten (List.map create_move_transitions move_sequences) in
-  print_endline "Generated transitions:";
+  (* print_endline "Generated transitions:";
   print_endline ("Len before: " ^ string_of_int (List.length transitions));
-  List.iter Automaton.print_transition transitions;
+  List.iter Automaton.print_transition transitions; *)
 
   let transitions_no_duplicates = remove_duplicates transitions in
 
-  print_endline "After removing duplicates:";
+  (* print_endline "After removing duplicates:";
   print_endline ("Len after: " ^ string_of_int (List.length transitions_no_duplicates));
-  List.iter Automaton.print_transition transitions_no_duplicates;
+  List.iter Automaton.print_transition transitions_no_duplicates; *)
 
   transitions_no_duplicates
