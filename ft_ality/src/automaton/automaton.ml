@@ -19,6 +19,18 @@ let print_transition tr =
      ", Key: " ^ tr.key_pressed ^ 
      ", Next state: " ^ string_list_to_string tr.next_state)
 
+let sdl_init () =
+  try
+    Sdl.init [`VIDEO];
+    at_exit Sdl.quit
+  with
+  | e -> raise e
+
+(* let sdl_loop () =
+  match Sdlevent.poll_event with
+  | None -> sdl_loop ()
+  | Some  *)
+
 let get_keypress () =
   flush stdout;
   let termio = Unix.tcgetattr Unix.stdin in
@@ -76,9 +88,11 @@ let clear_screen () =
   flush stdout (* Ensure output is flushed *)
 
 let automaton_loop alphabet accepting_states transitions =
+  sdl_init ();
   Parser.show_key_mappings alphabet;
   Parser.show_move_sequences accepting_states;
   List.iter print_transition transitions;
+  (* Stdio.printf *)
 
   let rec loop current_state () =
     let key = get_keypress () in

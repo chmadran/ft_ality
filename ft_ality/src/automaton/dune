@@ -1,4 +1,4 @@
 (library
  (name automaton)
- (libraries parser)
+ (libraries parser sdl2)
  (modules automaton))
