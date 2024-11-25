@@ -22,52 +22,19 @@ let print_transition tr =
 let sdl_init () =
   try
     Sdl.init [`VIDEO];
-    let _ = Sdl.Window.create2 
-      ~title:"My Window"
-      ~x:`centered      (* or `pos 100 for specific position *)
-      ~y:`centered      (* or `pos 100 for specific position *)
-      ~width:0
-      ~height:0
-      ~flags:[Sdlwindow.Borderless] (* common flags *)
-    in
-      ()
+    let _ = Sdl.Window.create2  ~title:"My Window" ~x:`centered ~y:`centered ~width:0 ~height:0 ~flags:[Sdlwindow.Borderless] in
+    at_exit Sdl.quit;
+    ()
   with
   | e -> raise e
     
-let rec sdl_loop () =
+let rec get_keypress () = 
   flush stdout;
   match Sdlevent.poll_event () with
   | Some (Sdl.Event.KeyDown evt) -> Sdlkeycode.to_string evt.keycode
-  | Some Sdl.Event.Quit _ -> exit 0
-  | _ -> sdl_loop ()
+  (* | Some Sdl.Event.Quit _ -> "esc" *)
+  | _ -> get_keypress ()
 
-
-let get_keypress () =
-  flush stdout;
-  let termio = Unix.tcgetattr Unix.stdin in
-  let () = Unix.tcsetattr Unix.stdin Unix.TCSADRAIN { termio with Unix.c_icanon = false; c_echo = false } in
-  let key_string =
-    let res = input_char stdin in
-    match res with
-    | '~' -> "esc"
-    | '\027' -> (
-        let res = input_char stdin in
-        match res with
-        | '[' -> (
-            let res = input_char stdin in
-            match res with
-            | 'A' -> "up"
-            | 'B' -> "down"
-            | 'C' -> "right"
-            | 'D' -> "left"
-            | _ -> ""
-          )
-        | _ -> "esc"
-      )
-    | _ -> String.make 1 res
-  in
-  Unix.tcsetattr Unix.stdin Unix.TCSADRAIN termio;
-  key_string
 
 let find_record (state: string list) (action: string) (transitions: transition list) =
   try
@@ -103,14 +70,13 @@ let automaton_loop alphabet accepting_states transitions =
   Parser.show_key_mappings alphabet;
   Parser.show_move_sequences accepting_states;
   List.iter print_transition transitions;
-  Printf.printf "Key pressed: %s\n" (sdl_loop ());
 
   let rec loop current_state () =
     let key = get_keypress () in
     match key with
-    | "esc" -> exit 0
+    | "Escape" -> exit 0
     | _ ->
-      let action = translate_key key alphabet in
+      let action = translate_key (String.lowercase_ascii key) alphabet in
       match action with
       | "" -> loop current_state ()
       | _ ->
