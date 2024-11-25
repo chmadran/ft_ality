@@ -32,9 +32,7 @@ let rec get_keypress () =
   flush stdout;
   match Sdlevent.poll_event () with
   | Some (Sdl.Event.KeyDown evt) -> Sdlkeycode.to_string evt.keycode
-  (* | Some Sdl.Event.Quit _ -> "esc" *)
   | _ -> get_keypress ()
-
 
 let find_record (state: string list) (action: string) (transitions: transition list) =
   try

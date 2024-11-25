@@ -1,4 +1,5 @@
-open Parser
+module Key_mappings = Parser.Key_mappings
+module Moves_parser = Parser.Moves_parser
 
 (* [check_file_input args] verifies that only one filename is provided 
    and checks if the file is accessible and readable. *)
@@ -21,7 +22,7 @@ let () =
   match check_file_input (Sys.argv) with
   | Some filename ->
     print_endline ("Parsing file '" ^ filename ^ "'...");
-    let key_mappings, move_sequences = process_grammar_file filename in
+    let key_mappings, move_sequences = Parser.process_grammar_file filename in
 
     print_endline "Key Mappings:";
     List.iter (fun km ->
