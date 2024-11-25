@@ -22,14 +22,13 @@ let print_transition tr =
 let sdl_init () =
   try
     Sdl.init [`VIDEO];
-    let _ = Sdl.Window.create2  ~title:"My Window" ~x:`centered ~y:`centered ~width:0 ~height:0 ~flags:[Sdlwindow.Borderless] in
+    let _ = Sdl.Window.create2  ~title:"My Window" ~x:`centered ~y:`centered ~width:0 ~height:0 ~flags:[Sdl.Window.Borderless] in
     at_exit Sdl.quit;
     ()
   with
   | e -> raise e
     
 let rec get_keypress () = 
-  flush stdout;
   match Sdlevent.poll_event () with
   | Some (Sdl.Event.KeyDown evt) -> Sdlkeycode.to_string evt.keycode
   | _ -> get_keypress ()
@@ -70,6 +69,7 @@ let automaton_loop alphabet accepting_states transitions =
   List.iter print_transition transitions;
 
   let rec loop current_state () =
+    flush stdout;
     let key = get_keypress () in
     match key with
     | "Escape" -> exit 0
